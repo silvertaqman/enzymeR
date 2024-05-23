@@ -7,15 +7,20 @@
 #' @examples
 #' michaelis_menten(df, model="time", method="lb")
 michaelis_menten <- function(df, model = c("time", "rate"), method = c("lb", "eh", "hw")) {
+  # Transform the data based on the model type
+  if (model == "time") {
+    # Set the appropriate column names for time (t) and substrate (S)
+    colnames(df) <- c("t", "S")
+    df <- data.frame(S = df$S[-1], v = diff(df$S) / diff(df$t)) #time2rate
+  } else if (model == "rate") {
+    # Set the appropriate column names for substrate (S) and rate (v)
+    colnames(df) <- c("S", "v")
+  } else {
+    stop("Invalid options: No time or rate data")
+  }
   # Ensure the model and method arguments are correctly matched
   model <- match.arg(model)
   method <- match.arg(method)
-  
-  # Save the original column names
-  savednames <- colnames(df)
-  
-  # Set the appropriate column names for substrate (S) and rate (v)
-  colnames(df) <- c("S", "v")
   
   # Define linearization functions
   linfun <- list(
@@ -44,11 +49,6 @@ michaelis_menten <- function(df, model = c("time", "rate"), method = c("lb", "eh
       return(params)
     }
   )
-  
-  # Transform the data based on the model type
-  if (model == "time") {
-    df <- data.frame(S = df$S, v = diff(df$S) / diff(df$time))
-  }
   
   # Apply the selected linearization method
   kinetic <- switch(method,
