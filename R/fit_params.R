@@ -5,8 +5,8 @@
 #' @param method Selection of a linearization strategy ("lb" for Lineweaver-Burk, "eh" for Eadie-Hofstee, "hw" for Hanes-Woolf)
 #' @return A list with Km and Vmax parameters
 #' @examples
-#' michaelis_menten(df, model="time", method="lb")
-michaelis_menten <- function(df, model = c("time", "rate"), method = c("lb", "eh", "hw")) {
+#' fit_params(df, model="time", method="lb")
+fit_params <- function(df, model = c("time", "rate"), method = c("lb", "eh", "hw")) {
   # Transform the data based on the model type
   if (model == "time") {
     # Set the appropriate column names for time (t) and substrate (S)
@@ -63,4 +63,4 @@ michaelis_menten <- function(df, model = c("time", "rate"), method = c("lb", "eh
 
 # Example usage:
 # df <- data.frame(time = c(0, 10, 20, 30, 40, 50), S = c(1.0, 0.9, 0.8, 0.7, 0.6, 0.5))
-# michaelis_menten(df, model = "time", method = "lb")
+# fit_params(df, model = "time", method = "lb")

@@ -9,5 +9,20 @@ UseSpacesForTab: Yes
 NumSpacesForTab: 2
 Encoding: UTF-8
 
-RnwWeave: Sweave
+RnwWeave: knitr
 LaTeX: pdfLaTeX
+
+BuildType: Package
+PackageUseDevtools: Yes
+PackageInstallArgs: --no-multiarch --with-keep.source
+
+MarkdownWrap: Column
+MarkdownWrapAtColumn: 72
+MarkdownReferences: Block
+MarkdownCanonical: Yes
+
+PythonType: system
+PythonVersion: 3.8.17
+PythonPath: /usr/local/bin/python
+
+SpellingDictionary: en_US
