@@ -1,6 +1,8 @@
 # enzymeR
+![enzymeR](https://github.com/silvertaqman/enzymeR/assets/89056118/f6acaddc-5f3f-4026-9002-0e4165fb651a)
+## Overview
 
-## Determination of parameters for Michaelis-Menten Dynamics and more
+**Determination of parameters for Michaelis-Menten Dynamics and more**
 
 Individual biochemical reactions are a useful method when critical metabolic points are needed. This package aims to fully characterize kinetical and thermodynamic properties of irreversible metabolic enzymes throught deriving a Michaelis-menten like rate equation, parameters and plots for tidy datasets. Also, there are functions and options to add:
 
@@ -15,7 +17,9 @@ Individual biochemical reactions are a useful method when critical metabolic poi
 
 If you want to colaborate just ask for pull requests.
 
-## How to use
+## Installation
+
+## Usage
 
 ### fit_params()
 
