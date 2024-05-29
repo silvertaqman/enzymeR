@@ -5,7 +5,6 @@
 #' @return df dataset with a time, substrate, reaction rate structure
 #' @examples
 #' simulate_kinetics(time, params=list(Km=0.0149,Vmax=2.533), inhibition=NULL)
-
 #Create an equations db
 # Definir las ecuaciones como funciones
 equations <- list(
@@ -19,7 +18,7 @@ equations <- list(
         )
       }
       )
-    return(df)}, 
+    return(df)},
   # Inhibition
   eq2 = function(time, params) { a * b * c },
   eq3 = function(time, params) { a^2 + b^2 + c^2 }
@@ -31,7 +30,7 @@ simulate_kinetics <- function(from=0, to=1, n=10, params, equations=equations) {
   required_params <- unique(unlist(lapply(equations, function(eq) {
     names(formals(eq))
   })))
-  
+
   if (!all(required_params %in% names(params))) {
     stop("Missing required parameters")
   }

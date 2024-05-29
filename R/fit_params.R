@@ -21,35 +21,35 @@ fit_params <- function(df, model = c("time", "rate"), method = c("lb", "eh", "hw
   # Ensure the model and method arguments are correctly matched
   model <- match.arg(model)
   method <- match.arg(method)
-  
+
   # Define linearization functions
   linfun <- list(
     linewaver = function(x) {
-      m <- lm(I(1/v) ~ I(1/S), data = x)
+      m <- stats::lm(I(1/v) ~ I(1/S), data = x)
       params <- list(
-        Km = as.double(coef(m)[2] / coef(m)[1]),
-        Vmax = as.double(1 / coef(m)[1])
+        Km = as.double(stats::coef(m)[2] / stats::coef(m)[1]),
+        Vmax = as.double(1 / stats::coef(m)[1])
       )
       return(params)
     },
     eadie = function(x) {
-      m <- lm(v ~ I(v/S), data = x)
+      m <- stats::lm(v ~ I(v/S), data = x)
       params <- list(
-        Km = as.double(-coef(m)[2]),
-        Vmax = as.double(coef(m)[1])
+        Km = as.double(-stats::coef(m)[2]),
+        Vmax = as.double(stats::coef(m)[1])
       )
       return(params)
     },
     hanes = function(x) {
-      m <- lm(I(S/v) ~ S, data = x)
+      m <- stats::lm(I(S/v) ~ S, data = x)
       params <- list(
-        Km = as.double(coef(m)[1] / coef(m)[2]),
-        Vmax = as.double(1 / coef(m)[2])
+        Km = as.double(stats::coef(m)[1] / stats::coef(m)[2]),
+        Vmax = as.double(1 / stats::coef(m)[2])
       )
       return(params)
     }
   )
-  
+
   # Apply the selected linearization method
   kinetic <- switch(method,
                     lb = linfun$linewaver(df),
@@ -57,7 +57,7 @@ fit_params <- function(df, model = c("time", "rate"), method = c("lb", "eh", "hw
                     hw = linfun$hanes(df),
                     stop("Method error: try again")
   )
-  
+
   return(kinetic)
 }
 
