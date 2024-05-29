@@ -1,5 +1,5 @@
-# enzymeR
-![enzymeR](https://github.com/silvertaqman/enzymeR/assets/89056118/f6acaddc-5f3f-4026-9002-0e4165fb651a)
+# enzymeR <a href="https://github.com/silvertaqman/enzymeR"><img src="man/figures/logo.png" align="right" height="138" /></a>
+
 ## Overview
 
 **Determination of parameters for Michaelis-Menten Dynamics and more**
