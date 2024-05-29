@@ -17,4 +17,17 @@ If you want to colaborate just ask for pull requests.
 
 ## How to use
 
-The general sintaxis needs a dataframe or tibble dataset with *S*: substrate concentration data [mM], and *v*: reaction rate. 
+### fit_params()
+
+The general sintaxis works with a relational dataset with the following structure with suggested units:
+
+- *t*: time for kinetic determination [min]
+- *S*: substrate concentration data [mM],
+- *v*: reaction rate [mM/min]
+
+Even if these variables are often measured within enzymatic kinetical experiments, only two of them are truly useful to fit parameters. You shoud choose the "time" options if your model data, usually at your excel file, has only time and Substrate concentration. If you calculated or measured reaction rate then choose "rate". Finally, choose a linearization method . Then, the function must be run:
+```
+fit_params(df, model="time", method="lb")
+```
+
+### simulate_kinetics()
