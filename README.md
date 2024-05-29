@@ -1,4 +1,4 @@
-# enzymeR <a href="https://github.com/silvertaqman/enzymeR"><img src="man/figures/logo.png" align="right" height="140" /></a>
+# enzymeR <a href="https://github.com/silvertaqman/enzymeR"><img src="man/figures/enzymeR.png" align="right" height="140" /></a>
 
 ## Overview
 
