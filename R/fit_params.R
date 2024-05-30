@@ -6,12 +6,15 @@
 #' @return A list with Km and Vmax parameters
 #' @examples
 #' fit_params(df, model="time", method="lb")
-fit_params <- function(df, model = c("time", "rate"), method = c("lb", "eh", "hw")) {
+fit_params <- function(df, model = c("time", "rate"), method = c("lin", "nonlin")) {
   # Transform the data based on the model type
   if (model == "time") {
     # Set the appropriate column names for time (t) and substrate (S)
     colnames(df) <- c("t", "S")
-    df <- data.frame(S = df$S[-1], v = diff(df$S) / diff(df$t)) #time2rate
+    # Generates rate column and discard initial substrate
+    df <- data.frame(
+      S = df$S[-1],
+      v = diff(df$S) / diff(df$t)) #time2rate
   } else if (model == "rate") {
     # Set the appropriate column names for substrate (S) and rate (v)
     colnames(df) <- c("S", "v")
@@ -22,45 +25,31 @@ fit_params <- function(df, model = c("time", "rate"), method = c("lb", "eh", "hw
   model <- match.arg(model)
   method <- match.arg(method)
 
-  # Define linearization functions
-  linfun <- list(
-    linewaver = function(x) {
-      m <- stats::lm(I(1/v) ~ I(1/S), data = x)
-      params <- list(
-        Km = as.double(stats::coef(m)[2] / stats::coef(m)[1]),
-        Vmax = as.double(1 / stats::coef(m)[1])
-      )
-      return(params)
-    },
-    eadie = function(x) {
-      m <- stats::lm(v ~ I(v/S), data = x)
-      params <- list(
-        Km = as.double(-stats::coef(m)[2]),
-        Vmax = as.double(stats::coef(m)[1])
-      )
-      return(params)
-    },
-    hanes = function(x) {
-      m <- stats::lm(I(S/v) ~ S, data = x)
-      params <- list(
-        Km = as.double(stats::coef(m)[1] / stats::coef(m)[2]),
-        Vmax = as.double(1 / stats::coef(m)[2])
-      )
-      return(params)
-    }
-  )
-
-  # Apply the selected linearization method
-  kinetic <- switch(method,
-                    lb = linfun$linewaver(df),
-                    eh = linfun$eadie(df),
-                    hw = linfun$hanes(df),
-                    stop("Method error: try again")
-  )
-
-  return(kinetic)
+  # Call lm function
+  linfun <- function(df, X) do.call("lm", list(X, quote(df)))
+  # Define linearization models
+  models <- list(
+    lineweaver = I(1/v) ~ I(1/S),
+    eadie = v ~ I(v/S),
+    hanes = I(S/v) ~ S)
+  fits <- lapply(X = models, FUN = linfun, df=df)
+  params <- list(
+    lineweaver = ##### RETOMAR AQUI
+      # ORDENA LA LISTA DE CONSTANTES A REGRESAR
+    Km = as.double(stats::coef(fits[[1]])[2] / stats::coef(fits[[1]])[1]),
+    Vmax = as.double(1 / stats::coef(fits[[1]])[1]))
+  params <- list(
+    Km = as.double(-stats::coef(fits[[2]])[2]),
+    Vmax = as.double(stats::coef(fits[[2]])[1]))
+  params <- list(
+    Km = as.double(stats::coef(fits[[3]])[1] / stats::coef(fits[[3]])[2]),
+    Vmax = as.double(1 / stats::coef(3)[2]))
+  # return the params list
+  params
 }
 
 # Example usage:
-# df <- data.frame(time = c(0, 10, 20, 30, 40, 50), S = c(1.0, 0.9, 0.8, 0.7, 0.6, 0.5))
+# df <- datos |>
+# dplyr::filter(ecnumber == "4.1.1.39", type=="irreversible") |>
+# dplyr::select(time, substrate)
 # fit_params(df, model = "time", method = "lb")
