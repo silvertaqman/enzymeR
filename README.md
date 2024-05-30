@@ -21,7 +21,7 @@ If you want to colaborate just ask for pull requests.
 
 ## Usage
 
-<a href="https://github.com/silvertaqman/enzymeR"><img src="man/figures/howto.png" align="right" height="300" /></a>
+<a href="https://github.com/silvertaqman/enzymeR"><img src="man/figures/howto.png" align="center" height="250" /></a>
 
 ### fit_params()
 
