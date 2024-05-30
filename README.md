@@ -20,8 +20,11 @@ If you want to colaborate just ask for pull requests.
 ## Installation
 
 ## Usage
+The sintax is described in the plot below:
 
 <a href="https://github.com/silvertaqman/enzymeR"><img src="man/figures/howto.png" align="center" height="250" /></a>
+
+You need a *df* dataset with a tidy structure or a *params* list of kinetical parameters and you can exchange between those forms.
 
 ### fit_params()
 
