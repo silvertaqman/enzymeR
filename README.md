@@ -22,7 +22,7 @@ If you want to colaborate just ask for pull requests.
 ## Usage
 The sintax is described in the plot below:
 
-<a href="https://github.com/silvertaqman/enzymeR"><img src="man/figures/howto.png" img{display: block; margin: auto;} height="250" /></a>
+<a href="https://github.com/silvertaqman/enzymeR"><img src="man/figures/howto.png" align="auto" height="250" /></a>
 
 You need a *df* dataset with a tidy structure or a *params* list of kinetical parameters and you can exchange between those forms.
 
