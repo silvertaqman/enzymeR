@@ -22,11 +22,12 @@ If you want to colaborate just ask for pull requests.
 ## Usage
 The sintax is described in the plot below:
 
-<div style="text-align: center;">
+<p align="center">
   <a href="https://github.com/silvertaqman/enzymeR">
     <img src="man/figures/howto.png" height="250" />
   </a>
-</div>
+</p>
+
 
 You need a *df* dataset with a tidy structure or a *params* list of kinetical parameters and you can exchange between those forms.
 
