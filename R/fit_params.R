@@ -6,7 +6,10 @@
 #' @return A list with Km and Vmax parameters
 #' @examples
 #' fit_params(df, model="time", method="lin")
-fit_params <- function(df, model = c("time", "rate"), method = c("lin", "nonlin"),level=.95,...) {
+fit_params <- function(df, model = c("time", "rate"), method = c("lineweaver","eadie","hanes","nonlinear"),level=.95,...) {
+  # Ensure the model and method arguments are correctly matched
+  model <- match.arg(model)
+  method <- match.arg(method)
   # Transform the data based on the model type
   if (model == "time") {
     # Set the appropriate column names for time (t) and substrate (S)
@@ -21,65 +24,75 @@ fit_params <- function(df, model = c("time", "rate"), method = c("lin", "nonlin"
   } else {
     stop("Invalid options: No time or rate data")
   }
-  # Ensure the model and method arguments are correctly matched
-  model <- match.arg(model)
-  method <- match.arg(method)
 
-  # Call lm function
-  linfun <- function(df, X) do.call("lm", list(X, quote(df)))
-  # Define linearization models
-  models <- list(
-    lineweaver = I(1/v) ~ I(1/S),
-    eadie = v ~ I(v/S),
-    hanes = I(S/v) ~ S)
-  fits <- lapply(X = models, FUN = linfun, df=df)
-  parms <- list(
-    lineweaver = list(
-      b = fits$lineweaver$coefficients[1],
-      m = fits$lineweaver$coefficients[2],
-      Km = fits$lineweaver$coefficients[2] / fits$lineweaver$coefficients[1],
-      Vmax = 1 / fits$lineweaver$coefficients[1]),
-    eadie = list(
-      b = fits$eadie$coefficients[1],
-      m = fits$eadie$coefficients[2],
-      Km = - fits$eadie$coefficients[2],
-      Vmax = fits$eadie$coefficients[1]),
-    hanes = list(
-      b = fits$hanes$coefficients[1],
-      m = fits$hanes$coefficients[2],
-      Km = fits$hanes$coefficients[1] / fits$hanes$coefficients[2],
-      Vmax = 1/fits$hanes$coefficients[2])
-  )
-  kinetics <- list(
-    lineweaver = fits$lineweaver |>
-      confint() |>
-      rbind(Vmax=c(parms$lineweaver$Vmax - qt(level, df=nrow(df)-2) * summary(fits$lineweaver)$coefficients[1,2] / parms$lineweaver$b^2,
-                   parms$lineweaver$Vmax + qt(level, df=nrow(df)-2) * summary(fits$lineweaver)$coefficients[1,2] / parms$lineweaver$b^2)) |>
-      rbind(Km=c(parms$lineweaver$Km - qt(level, df=nrow(df)-2) * sqrt(summary(fits$lineweaver)$coefficients[2,2]^2 /parms$lineweaver$b^2 + parms$lineweaver$m^2 * summary(fits$lineweaver)$coefficients[1,2]^2 / parms$lineweaver$b^4 - 2 * parms$lineweaver$m * vcov(fits$lineweaver)[2,1] / parms$lineweaver$b^3),
-                 parms$lineweaver$Km + qt(level, df=nrow(df)-2) *sqrt(summary(fits$lineweaver)$coefficients[2,2]^2 /parms$lineweaver$b^2 + parms$lineweaver$m^2 * summary(fits$lineweaver)$coefficients[1,2]^2 / parms$lineweaver$b^4 - 2 * parms$lineweaver$m * vcov(fits$lineweaver)[2,1] / parms$lineweaver$b^3))) |>
-      cbind(estimate=parms$lineweaver),
-    eadie = fits$eadie |>
-      confint(level=level,...) |>
-      rbind(Vmax=c(parms$eadie$Vmax - qt(level, df=nrow(df)-2) * summary(fits$eadie)$coefficients[1,2] / parms$eadie$b^2,
-                   parms$eadie$Vmax + qt(level, df=nrow(df)-2) * summary(fits$eadie)$coefficients[1,2] / parms$eadie$b^2)) |>
-      rbind(Km=c(parms$eadie$Km - qt(level, df=nrow(df)-2) * sqrt(summary(fits$eadie)$coefficients[2,2]^2 /parms$eadie$b^2 + parms$eadie$m^2 * summary(fits$eadie)$coefficients[1,2]^2 / parms$eadie$b^4 - 2 * parms$eadie$m * vcov(fits$eadie)[2,1] / parms$eadie$b^3),
-                 parms$eadie$Km + qt(level, df=nrow(df)-2) *sqrt(summary(fits$eadie)$coefficients[2,2]^2 /parms$eadie$b^2 + parms$eadie$m^2 * summary(fits$eadie)$coefficients[1,2]^2 / parms$eadie$b^4 - 2 * parms$eadie$m * vcov(fits$eadie)[2,1] / parms$eadie$b^3))) |>
-      cbind(estimate=parms$eadie),
-    hanes = fits$hanes |>
-      confint(level=level,...) |>
-      rbind(Vmax=c(parms$hanes$Vmax - qt(level, df=nrow(df)-2) * summary(fits$hanes)$coefficients[1,2] / parms$hanes$b^2,
-                   parms$hanes$Vmax + qt(level, df=nrow(df)-2) * summary(fits$hanes)$coefficients[1,2] / parms$hanes$b^2)) |>
-      rbind(Km=c(parms$hanes$Km - qt(level, df=nrow(df)-2) * sqrt(summary(fits$hanes)$coefficients[2,2]^2 /parms$hanes$b^2 + parms$hanes$m^2 * summary(fits$hanes)$coefficients[1,2]^2 / parms$hanes$b^4 - 2 * parms$hanes$m * vcov(fits$hanes)[2,1] / parms$hanes$b^3),
-                 parms$hanes$Km + qt(level, df=nrow(df)-2) *sqrt(summary(fits$hanes)$coefficients[2,2]^2 /parms$hanes$b^2 + parms$hanes$m^2 * summary(fits$hanes)$coefficients[1,2]^2 / parms$hanes$b^4 - 2 * parms$hanes$m * vcov(fits$hanes)[2,1] / parms$hanes$b^3)))  |>
-      cbind(estimate=parms$hanes)
+  # Call lm function to define linearization models
+  parms <- switch(
+      method,
+      "lineweaver" = {
+        m <- lm(I(1/v) ~ I(1/S), df)
+        fits <- coef(m)
+        list(
+          m = m,
+          beta0 = fits[1],
+          beta1 = fits[2],
+          Km = fits[2] / fits[1],
+          Vmax = 1 / fits[1],
+          varbeta0 = summary(m)$coefficients[1, 2],
+          varbeta1 = summary(m)$coefficients[2, 2])
+      },
+      "eadie" = {
+        m <- lm(v ~ I(v/S), df)
+        fits <- coef(m)
+        list(
+          m = m,
+          beta0 = fits[1],
+          beta1 = fits[2],
+          Km = -fits[2],
+          Vmax = fits[1],
+          varbeta0 = summary(m)$coefficients[1, 2],
+          varbeta1 = summary(m)$coefficients[2, 2])
+      },
+      "hanes" = {
+        m <- lm(I(S/v) ~ S, df)
+        fits <- coef(m)
+        list(
+          m = m,
+          beta0 = fits[1],
+          beta1 = fits[2],
+          Km = fits[1] / fits[2],
+          Vmax = 1 / fits[2],
+          varbeta0 = summary(m)$coefficients[1, 2],
+          varbeta1 = summary(m)$coefficients[2, 2])
+      },
+      "nonlinear" = {
+        m <- nls(v ~ Vmax * S / (Km + S), start = list(Vmax = 1, Km = 1), data = df)
+        list(
+          m = m,
+          Km = coef(m)[2],
+          Vmax = coef(m)[1],
+          varVmax = summary(m)$coefficients[1, 2],
+          varKm = summary(m)$coefficients[2, 2])
+      }
     )
 
+  # Get statistics like confidence intervals and p-value with error propagation formula
+  statistics <- with(parms, m |>
+      confint(level = level) |>
+    rbind(Vmax=c(
+      Vmax - qt(level, df=nrow(df)-2) * varbeta0 / beta0^2,
+      Vmax + qt(level, df=nrow(df)-2) * varbeta0 / beta0^2)) |>
+    rbind(Km=c(
+      Km - qt(level, df=nrow(df)-2) * sqrt(varbeta1 / beta0^2 + beta1^2 * varbeta0 / beta0^4 - 2 * beta1 * vcov(m)[2,1] / beta0^3),
+      Km + qt(level, df=nrow(df)-2) *sqrt(varbeta1 / beta0^2 + beta1^2 * varbeta0 / beta0^4 - 2 * beta1 * vcov(m)[2,1] / beta0^3)))) |>
+      cbind(estimate=parms[names(parms)[2:5]]) # add se, t and p value test
+
   # return the parameters list
-  return(kinetics)
+  return(list(unlist(parms[names(parms)[2:5]]), statistics))
 }
 
 # Example usage:
 # df <- kinetics |>
 # dplyr::filter(ecnumber == "4.1.1.39", type=="irreversible") |>
-# dplyr::select(time, substrate)
-# fit_params(df, model = "time", method = "lin")
+# dplyr::select(time, substrate) |>
+# tidyr::drop_na() |>
+# fit_params(model = "rate", method = "nonlinear")
