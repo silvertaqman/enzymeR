@@ -22,7 +22,12 @@ If you want to colaborate just ask for pull requests.
 ## Usage
 The sintax is described in the plot below:
 
-<a href="https://github.com/silvertaqman/enzymeR"><img src="man/figures/howto.png" align="auto" height="250" /></a>
+<p align="center">
+  <a href="https://github.com/silvertaqman/enzymeR">
+    <img src="man/figures/howto.png" height="250" />
+  </a>
+</p>
+
 
 You need a *df* dataset with a tidy structure or a *params* list of kinetical parameters and you can exchange between those forms.
 
@@ -48,4 +53,23 @@ You should provide a list with a set of parameters and a certain mode of operati
 - *K_a*: Activator concentration constat
 
 ### kinetic_plots()
-This function allows to get every linearization plot and the direct plot method. Also, the Time-Substrate and Substrate-Rate plot are showed.
+This function allows to get:
+- Linearization plots and the direct plot method
+```
+df |>
+  fit_params() |>
+  kinetic_plots(mode="linearization")
+```
+  
+- Substrate-Rate plot for the best model, or the one with minimum error, and the confidence intervals for parameters
+```
+df |>
+  fit_params() |>
+  kinetic_plots(mode="best")
+```
+ 
+- Substrate-Rate over time plot as an animated plot
+```
+simulate_kinetics(time, parms) |>
+  kinetic_plots(mode="simulation")
+```
