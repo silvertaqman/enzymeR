@@ -3,94 +3,98 @@
 #' @param df Substrate-time or substrate-reaction rate dataset
 #' @param model Selection of the model type ("time" for substrate-time or "rate" for substrate-reaction rate)
 #' @param method Selection of a linearization strategy ("lb" for Lineweaver-Burk, "eh" for Eadie-Hofstee, "hw" for Hanes-Woolf)
-#' @return A list with Km and Vmax parameters
+#' @return A list with Km and Vmax parameters, and a matrix with its statistics
 #' @examples
-#' fit_params(df, model="time", method="lin")
-fit_params <- function(df, model = c("time", "rate"), method = c("lineweaver","eadie","hanes","nonlinear"),level=.95,...) {
-  # Ensure the model and method arguments are correctly matched
+#' fit_params(df, model="pH", method="lineweaver")
+library(pracma)
+fit_params <- function(df, model = c("one-substrate","pH","temperature","ionic","inhibition","allosteric"), method = c("lineweaver","eadie","hanes","nonlinear"), level=.95,...) {
+    # Ensure the model and method arguments are correctly matched
   model <- match.arg(model)
   method <- match.arg(method)
-  # Transform the data based on the model type
-  if (model == "time") {
-    # Set the appropriate column names for time (t) and substrate (S)
-    colnames(df) <- c("t", "S")
-    # Generates rate column and discard initial substrate
-    df <- data.frame(
-      S = df$S[-1],
-      v = - diff(df$S) / diff(df$t)) #time2rate
-  } else if (model == "rate") {
-    # Set the appropriate column names for substrate (S) and rate (v)
-    colnames(df) <- c("S", "v")
-  } else {
-    stop("Invalid options: No time or rate data")
-  }
-
-  # Call lm function to define linearization models
-  parms <- switch(
+  names(df)<-c("S","v") # be sure to set the standard before input
+  # Edit lm function to define linearization models
+  fit <- switch(
       method,
-      "lineweaver" = {
+      "lineweaver" = with(df, {
         m <- lm(I(1/v) ~ I(1/S), df)
-        fits <- coef(m)
-        list(
-          m = m,
-          beta0 = fits[1],
-          beta1 = fits[2],
-          Km = fits[2] / fits[1],
-          Vmax = 1 / fits[1],
-          varbeta0 = summary(m)$coefficients[1, 2],
-          varbeta1 = summary(m)$coefficients[2, 2])
-      },
-      "eadie" = {
+        f <- coefs2params(method)
+        b <- m$coefficients
+        names(b) = NULL
+        m$params <- f(b)
+        m$covR <- vcov(m)
+        m$J <- jacobian(f,x0=b)
+        return(m)
+      }),
+      "eadie" = with(df, {
         m <- lm(v ~ I(v/S), df)
-        fits <- coef(m)
-        list(
-          m = m,
-          beta0 = fits[1],
-          beta1 = fits[2],
-          Km = -fits[2],
-          Vmax = fits[1],
-          varbeta0 = summary(m)$coefficients[1, 2],
-          varbeta1 = summary(m)$coefficients[2, 2])
-      },
-      "hanes" = {
+        f <- coefs2params(method)
+        b <- m$coefficients
+        names(b) = NULL
+        m$params <- f(b)
+        m$covR <- vcov(m)
+        m$J <- jacobian(f,x0=b)
+        return(m)
+      }),
+      "hanes" = with(df, {
         m <- lm(I(S/v) ~ S, df)
-        fits <- coef(m)
-        list(
-          m = m,
-          beta0 = fits[1],
-          beta1 = fits[2],
-          Km = fits[1] / fits[2],
-          Vmax = 1 / fits[2],
-          varbeta0 = summary(m)$coefficients[1, 2],
-          varbeta1 = summary(m)$coefficients[2, 2])
-      },
-      "nonlinear" = {
-        m <- nls(v ~ Vmax * S / (Km + S), start = list(Vmax = 1, Km = 1), data = df)
-        list(
-          m = m,
-          Km = coef(m)[2],
-          Vmax = coef(m)[1],
-          varVmax = summary(m)$coefficients[1, 2],
-          varKm = summary(m)$coefficients[2, 2])
-      }
+        f <- coefs2params(method)
+        b <- m$coefficients
+        names(b) = NULL
+        m$params <- f(b)
+        m$covR <- vcov(m)
+        m$J <- jacobian(f,x0=b)
+        return(m)
+      }),
+      "nonlinear" = with(df, {
+        m <- nls(v ~ Vmax * S / (Km + S),
+                 start = list(Vmax = max(v), Km = quantile(S,probs=0.2)), # makes a better estimation
+                 data = df)
+        f <- coefs2params(method)
+        b <- m$coefficients
+        names(b) = NULL
+        m$params <- f(b)
+        m$covR <- vcov(m)
+        m$J <- jacobian(f,x0=b)
+        return(m)
+      })
     )
 
   # Get statistics like confidence intervals and p-value with error propagation formula
-  statistics <- with(parms, m |>
-      confint(level = level) |>
-    rbind(Vmax=c(
-      Vmax - qt(level, df=nrow(df)-2) * varbeta0 / beta0^2,
-      Vmax + qt(level, df=nrow(df)-2) * varbeta0 / beta0^2)) |>
-    rbind(Km=c(
-      Km - qt(level, df=nrow(df)-2) * sqrt(varbeta1 / beta0^2 + beta1^2 * varbeta0 / beta0^4 - 2 * beta1 * vcov(m)[2,1] / beta0^3),
-      Km + qt(level, df=nrow(df)-2) *sqrt(varbeta1 / beta0^2 + beta1^2 * varbeta0 / beta0^4 - 2 * beta1 * vcov(m)[2,1] / beta0^3)))) |>
-      cbind(estimate=parms[names(parms)[2:5]]) # add se, t and p value test
+  # Only for linear models
+  statistics <- with(fit, {
+    names(coefficients)<-NULL
+    # Matricial error propagation aproximation to variance of non-linear transformation
+    covT = J %*% covR %*% t(J)
+    dof = nrow(df)-2
+    t0 = qt(level, df=dof)
+    Vmax = params[1]
+    Km = params[2]
+    seVmax = sqrt(covT[1,1] / dof)
+    seKm = sqrt(covT[2,2] / dof)
+    st <- matrix(nrow=2,ncol=0)
+    rownames(st) <- c("Vmax","Km")
+    st <- st|>
+      cbind(estimate=c(Vmax,Km)) |>
+      cbind(se = c(seVmax, seKm))|>
+      cbind(t = c(Vmax/seVmax, Km/seKm)) |>
+      cbind(p_value = c(
+        2*pt(Vmax/seVmax, df=dof, lower.tail = FALSE),
+        2*pt(Km/seKm, df=dof, lower.tail = FALSE))) |>
+      cbind(Lower=c(
+        Vmax - t0 * seVmax,
+        Km - t0 * seKm)) |>
+      cbind(Upper=c(
+        Vmax + t0 * seVmax,
+        Km + t0 * seKm))
+    return(st)
+  })
 
   # return the parameters list
-  return(list(unlist(parms[names(parms)[2:5]]), statistics))
+  return(list(fit, statistics))
 }
 
 # Example usage:
+# load(file = "data/kinetics.rda")
 # df <- kinetics |>
 # dplyr::filter(ecnumber == "4.1.1.39", type=="irreversible") |>
 # dplyr::select(time, substrate) |>

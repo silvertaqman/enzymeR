@@ -6,8 +6,8 @@
 \usage{
 fit_params(
   df,
-  model = c("time", "rate"),
-  method = c("lin", "nonlin"),
+  model = c("one-substrate", "pH", "temperature", "ionic", "inhibition", "allosteric"),
+  method = c("lineweaver", "eadie", "hanes", "nonlinear"),
   level = 0.95,
   ...
 )
