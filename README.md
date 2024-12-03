@@ -45,6 +45,18 @@ fit_params(df, model="time", method="lb")
 ```
 This implementation allows to get a non-linear regression method with base on ... 
 
+#### Example
+```
+library(enzymer)
+data(kinetics)  # Load included data
+sample_kinetics <- kinetics |>
+  dplyr::filter(ecnumber == "4.1.1.39", type=="irreversible") |>
+  dplyr::select(time, substrate) |>
+  tidyr::drop_na()
+result <- fit_params(sample_kinetics, model = "one-substrate", method = "nonlinear")
+print(result$statistics)
+```
+
 ### simulate_kinetics()
 You should provide a list with a set of parameters and a certain mode of operation:
 - *K_m*: Concentration to get half of maximum rate
