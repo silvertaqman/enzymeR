@@ -29,7 +29,7 @@ The sintax is described in the plot below:
 </p>
 
 
-You need a *df* dataset with a tidy structure or a *params* list of kinetical parameters and you can exchange between those forms.
+You need a *df* dataset with a tidy structure or a *params* list of kinetical parameters and you can exchange between those forms. See *data-raw* for examples.
 
 ### fit_params()
 
