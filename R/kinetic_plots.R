@@ -16,11 +16,5 @@ kinetic_plot <- function(df) {
     geom_line()
   return(a/b)
 }
-
-# Optionally plot results
-if (plot) {
-  plot(df$S, df$v, main = paste("Fit:", method), xlab = "Substrate (S)", ylab = "Reaction Rate (v)")
-  curve(predict(fit, newdata = data.frame(S = x)), add = TRUE, col = "red")
-}
 # Example
 
