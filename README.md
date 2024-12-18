@@ -11,9 +11,7 @@ $$S \overset{\text{E}}{\longrightarrow} P$$
 
 But is usually referred to show complex intermediates between substrate and enzymes:
 
-$$
-E+S \underset{\text{k_{-1}}}{\overset{\text{k_1}}{\rightleftharpoons}} ES \overset{\text{k_2}}{\longrightarrow} E+P
-$$
+$$E+S \underset{\text{k_{-1}}}{\overset{\text{k_1}}{\rightleftharpoons}} ES \overset{\text{k_2}}{\longrightarrow} E+P$$
 
 This package aims to fully characterize kinetical and thermodynamic properties of irreversible metabolic enzymes throught deriving a Michaelis-menten like rate equation, parameters and plots for tidy datasets. So, you just only need two kind of measurements: 
 
