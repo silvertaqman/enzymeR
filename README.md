@@ -11,13 +11,15 @@ $$S \overset{\text{E}}{\longrightarrow} P$$
 
 But is usually referred to show complex intermediates between substrate and enzymes:
 
-\[ E+S \underset{\text{k_{-1}}}{\overset{\text{k_1}}{\rightleftharpoons}} ES \overset{\text{k_2}}{\longrightarrow} E+P
-\]
+$$E + S \underset{k_{-1}}{\overset{k_1}{\rightleftharpoons}} ES \overset{k_2}{\longrightarrow} E + P$$
 
 This package aims to fully characterize kinetical and thermodynamic properties of irreversible metabolic enzymes throught deriving a Michaelis-menten like rate equation, parameters and plots for tidy datasets. So, you just only need two kind of measurements: 
 
 a) Time & Substrate measurements
+
 b) Substrate & Rate measurements
+
+Also, you can specify information about your enzyme to get more parameters associated to it, like $k_{cat}$.
 
 And you can obtain $V_{max}$ and $K_m$ estimations with statistical behaviour like deviance, confidence intervals and hypothesis testing capability compatible with R functions.
 
@@ -25,47 +27,49 @@ And you can obtain $V_{max}$ and $K_m$ estimations with statistical behaviour li
 
 This package allows compatibility with statistical inquiries for the user, typical plots and linearization methods makes easy. Implements S4 OO programming logic to set an estimator and simulator environment. It includes functions and options to account for:
 
-- Parameter estimation with
-  + Linearization strategies by
-    + Lineweaver-Burk Method
-    + Eadie-Hofstee Method
-    + Hanes-Woolf Method
-  + Non-Linear strategies by
-    + Weighted least-squares
-    + Generalized Linear Models
-- Elasticities
-- Reversibility
-- Mass Action Disequilibrium Ratio $\Gamma$ 
-- the usual five kinds of *inhibition*, allowing to estimate:
-  + Competitive
-  + Non competitive
-  + Uncompetitive
-  + Partial Inhibition
-  + Mixed Inhibition
-  + Binding of inhibitors to enzyme,
-  + Substrate inhibition
-  + inhibition by binding to substrate
-  + Binding of ligands to proteins
-  + *Activation* of enzymes
-- Cooperativity with:
-  + Hill equation
-  + Ligand Binding
-  + Adair Equation
-  + *Monod-Wynad-Changeaux* (MWC) rate expression for enzymes with sigmoid kinetics.
-  + *KNF* Sequential Model
-- Allostery
-- Multireactant mechanisms with
-  + Ordered Bi-Bi
-  + Random Order
-  + Ping-Pong Mechanism
-- Temperature and pH dependence
-- Generalized Rate laws
-  + Linear
-  + Linear - Logarithmic
-  + Algebraic Aproximations
-  + Hanekom Rate law
-  + Liebermeister Rate Law
-- Kinetics plots
+- Reversibility treatment of equations
+- Kinetic parameter estimation as:
+  - $Vm$ and $Km$-like parameters with
+    + Linearization strategies
+      + Lineweaver-Burk Method
+      + Eadie-Hofstee Method
+      + Hanes-Woolf Method
+    + Non-Linear strategies by
+      + Weighted least-squares
+      + Generalized Linear Models
+  - Elasticities
+- Modelling options for simulation, like:
+  - Mass Action Disequilibrium Ratio $\Gamma$ models
+  - the usual five kinds of *inhibition*, allowing to estimate:
+    + Competitive
+    + Non competitive
+    + Uncompetitive
+    + Partial Inhibition
+    + Mixed Inhibition
+    + Binding of inhibitors to enzyme,
+    + Substrate inhibition
+    + inhibition by binding to substrate
+    + Binding of ligands to proteins
+    + *Activation* of enzymes
+  - Cooperativity with:
+    + Hill equation
+    + Ligand Binding
+    + Adair Equation
+    + *Monod-Wynad-Changeaux* (MWC) rate expression for enzymes with sigmoid kinetics.
+    + *KNF* Sequential Model
+  - Allostery
+  - Multireactant mechanisms with
+    + Ordered Bi-Bi
+    + Random Order
+    + Ping-Pong Mechanism
+  - Temperature and pH dependence
+  - Generalized Rate laws
+    + Linear
+    + Linear - Logarithmic
+    + Algebraic Aproximations
+    + Hanekom Rate law
+    + Liebermeister Rate Law
+- Kinetic plots
 
 And, as you may know by this time, you can use this package to simulate kinetics of gene regulation. We include example data and tests to simulate:
 
