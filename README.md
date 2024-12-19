@@ -99,13 +99,13 @@ You need a *df* dataset with a tidy structure or a *params* list of kinetical pa
 
 The general sintaxis works with a relational, or tidy, dataset with the following structure with suggested units:
 
-- *t*: time for kinetic determination [min]
-- *S*: substrate concentration data [mM],
-- *v*: reaction rate [mM/min]
+- *time*: time for kinetic determination [min]
+- *substrate*: substrate concentration data [mM],
+- *rate*: reaction rate [mM/min]
 
 Even if these variables are often measured within enzymatic kinetical experiments, only two of them are truly useful to fit parameters. You shoud choose the "time" options if your model data, usually at your excel file, has only time and Substrate concentration. If you calculated or measured reaction rate then choose "rate". Finally, choose a linearization method . Then, the function must be run:
 ```
-fit_params(df, model="time", method="lb")
+fit_params(df, model="", method="lineweaver", type="ts")
 ```
 This implementation allows to get a non-linear regression method with base on ... 
 

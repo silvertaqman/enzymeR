@@ -7,6 +7,7 @@
 #' @examples
 #' fit_params(df, model="pH", method="lineweaver")
 library(pracma)
+library(minpack.lm)
 fit_params <- function(df, model = c("one-substrate","pH","temperature","ionic","inhibition","allosteric"), method = c("lineweaver","eadie","hanes","nonlinear"), level=.95,...) {
     # Ensure the model and method arguments are correctly matched
   model <- match.arg(model)
